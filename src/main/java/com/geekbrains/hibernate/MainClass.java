@@ -62,7 +62,6 @@ public class MainClass {
                         globalCounter.decrementAndGet();
                     } catch (Exception e) {
                         e.printStackTrace();
-
                     }
                     if (session != null) {
                         session.close();
