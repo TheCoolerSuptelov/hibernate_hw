@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -48,10 +49,11 @@ public class MainClass {
         ExecutorService executorService = Executors.newFixedThreadPool(8);
 
         for (int i = 0; i < 8; i++) {
-            new Thread(() -> {
+            executorService.execute(() -> {
                 while (globalCounter.get() > 0) {
+                    Session session = null;
                     try {
-                        Session session = factory.getCurrentSession();
+                        session = factory.getCurrentSession();
                         session.beginTransaction();
                         Items item = (Items) session.get(Items.class, getRandomNumberUsingInts(), LockMode.PESSIMISTIC_WRITE);
                         item.increaseCounter();
@@ -60,11 +62,19 @@ public class MainClass {
                         globalCounter.decrementAndGet();
                     } catch (Exception e) {
                         e.printStackTrace();
+
+                    }
+                    if (session != null) {
+                        session.close();
                     }
                 }
-
-            }
-            );
+            });
+        }
+        long timeOut = 600;
+        try {
+            executorService.awaitTermination(timeOut, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 

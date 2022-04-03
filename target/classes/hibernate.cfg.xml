@@ -10,7 +10,7 @@
         <property name="connection.username">java_hibernate</property>
         <property name="connection.password">java_hibernate</property>
         <property name="hibernate.default_schema">hw11</property>
-        <property name="connection.pool_size">1</property>
+        <property name="connection.pool_size">100</property>
         <property name="dialect">org.hibernate.dialect.PostgreSQL94Dialect</property>
 
         <property name="show_sql">true</property>
