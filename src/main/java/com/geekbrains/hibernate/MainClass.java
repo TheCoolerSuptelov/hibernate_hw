@@ -4,6 +4,9 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class MainClass {
     public static void main(String[] args) {
 
@@ -11,21 +14,23 @@ public class MainClass {
         configuration.configure("hibernate.cfg.xml");
         configuration.addAnnotatedClass(Customers.class);
         configuration.addAnnotatedClass(Goods.class);
-        configuration.addAnnotatedClass(PurchaseHistory.class);
-        SessionFactory factory = configuration.buildSessionFactory();
 
+        SessionFactory factory = configuration.buildSessionFactory();
         Session session = factory.getCurrentSession();
-        session.beginTransaction();
         Customers customerXi = new Customers("Xi");
         Customers customerLi = new Customers("Li");
         Customers customerHo = new Customers("Ho");
-        Goods potato = new Goods("potato",12f);
-        customerHo.addProductToPurchaseHistory(potato,session);
-        Goods rice = new Goods("rice",42f);
-        customerHo.addProductToPurchaseHistory(rice,session);
-        Goods chickenFillet = new Goods("chickenFillet",120f);
-        customerHo.addProductToPurchaseHistory(chickenFillet,session);
+        Goods potato = new Goods("potato", 12f);
+        Goods chickenFillet = new Goods("chickenFillet", 120f);
+        Goods rice = new Goods("rice", 42f);
 
+        customerLi.addProductToPurchaseHistory(chickenFillet, session);
+
+        customerHo.addProductToPurchaseHistory(chickenFillet, session);
+        customerHo.addProductToPurchaseHistory(potato, session);
+        customerHo.addProductToPurchaseHistory(rice, session);
+
+        session.beginTransaction();
         session.save(potato);
         session.save(rice);
         session.save(chickenFillet);
@@ -33,5 +38,14 @@ public class MainClass {
         session.save(customerLi);
         session.save(customerHo);
         session.getTransaction().commit();
+
+        Session curSession = factory.getCurrentSession();
+        curSession.beginTransaction();
+        // System.out.println(chickenFillet.whoBoughtProduct(curSession));
+        System.out.println(chickenFillet.getCustomersList().stream().map(customer->customer.getName()).collect(Collectors.joining(", ")));
+        System.out.println(customerHo.showPurchaseHistory());
+        curSession.getTransaction().commit();
     }
 }
+
+

@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.persistence.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name="Customer")
@@ -16,25 +17,18 @@ public class Customers {
     private String name;
 
     @ManyToMany
-    @JoinTable(name="purchaseHistoryByCustomer",
+    @JoinTable(schema = "hw11",name="purchaseHistoryByCustomer",
     joinColumns = @JoinColumn(name="customer_id"),
-    inverseJoinColumns = @JoinColumn(name = "PurchaseHistory.customer_id"))
+    inverseJoinColumns = @JoinColumn(name = "goods_id"))
     private List<Goods> purchaseHistoryByCustomer;
-
-    @ManyToMany
-    @JoinTable(name = "PurchaseHistory",
-    joinColumns = @JoinColumn(name = "customer_id"),
-    inverseJoinColumns = @JoinColumn(name = "PurchaseHistory.customer_id"))
-    private List<PurchaseHistory> purchaseHistoryRecords;
 
     public Customers() {
 
     }
 
     public Customers(String name) {
-        this.name = name;
-        this.purchaseHistoryRecords = new ArrayList<PurchaseHistory>();
-        this.purchaseHistoryByCustomer = new ArrayList<Goods>();
+      this.name = name;
+      this.purchaseHistoryByCustomer = new ArrayList<Goods>();
     }
 
     public String getName() {
@@ -46,10 +40,13 @@ public class Customers {
     }
 
     public void addProductToPurchaseHistory(Goods product, Session session){
-        //public PurchaseHistory(Customers customer, Goods product, Float salesAmount) {
-        PurchaseHistory pH = PurchaseHistory.createPurchaseHistoryRecord(this, product, product.getPrice());
-        session.save(pH);
-        this.purchaseHistoryRecords.add(pH);
-        this.purchaseHistoryByCustomer.add(product);
+       this.purchaseHistoryByCustomer.add(product);
+       product.getCustomersList().add(this);
+    }
+
+    public String showPurchaseHistory(){
+        return purchaseHistoryByCustomer.stream().
+                map(product->product.getTitle()).
+                collect(Collectors.joining(", "));
     }
 }
