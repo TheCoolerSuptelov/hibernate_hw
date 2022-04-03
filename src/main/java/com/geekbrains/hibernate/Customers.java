@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.persistence.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name="Customer")
@@ -16,7 +17,7 @@ public class Customers {
     private String name;
 
     @ManyToMany
-    @JoinTable(name="purchaseHistoryByCustomer",
+    @JoinTable(schema = "hw11",name="purchaseHistoryByCustomer",
     joinColumns = @JoinColumn(name="customer_id"),
     inverseJoinColumns = @JoinColumn(name = "goods_id"))
     private List<Goods> purchaseHistoryByCustomer;
@@ -40,5 +41,12 @@ public class Customers {
 
     public void addProductToPurchaseHistory(Goods product, Session session){
        this.purchaseHistoryByCustomer.add(product);
+       product.getCustomersList().add(this);
+    }
+
+    public String showPurchaseHistory(){
+        return purchaseHistoryByCustomer.stream().
+                map(product->product.getTitle()).
+                collect(Collectors.joining(", "));
     }
 }
