@@ -11,11 +11,10 @@ public class MainClass {
         configuration.configure("hibernate.cfg.xml");
         configuration.addAnnotatedClass(Customers.class);
         configuration.addAnnotatedClass(Goods.class);
-        configuration.addAnnotatedClass(PurchaseHistory.class);
         SessionFactory factory = configuration.buildSessionFactory();
 
         Session session = factory.getCurrentSession();
-        session.beginTransaction();
+
         Customers customerXi = new Customers("Xi");
         Customers customerLi = new Customers("Li");
         Customers customerHo = new Customers("Ho");
@@ -26,6 +25,7 @@ public class MainClass {
         Goods chickenFillet = new Goods("chickenFillet",120f);
         customerHo.addProductToPurchaseHistory(chickenFillet,session);
 
+        session.beginTransaction();
         session.save(potato);
         session.save(rice);
         session.save(chickenFillet);

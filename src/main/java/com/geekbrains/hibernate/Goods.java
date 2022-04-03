@@ -13,12 +13,6 @@ public class Goods {
     @Column(name="title")
     private String title;
 
-    @ManyToMany
-    @JoinTable(name = "PurchaseHistory",
-            joinColumns = @JoinColumn(name = "product_id"),
-            inverseJoinColumns = @JoinColumn(name = "PurchaseHistory.product_id"))
-    private List<PurchaseHistory> PurchaseHistory;
-
     @Column(name="price")
     private Float price;
 
